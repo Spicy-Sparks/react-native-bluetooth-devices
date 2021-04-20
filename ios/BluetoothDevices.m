@@ -27,8 +27,7 @@ RCT_EXPORT_METHOD(disconnect) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-RCT_EXPORT_METHOD(openMenu) {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+RCT_EXPORT_METHOD(connectToDevice:(NSString *) deviceId) {
 }
 
 - (void)routeChanged:(NSNotification *)sender {
