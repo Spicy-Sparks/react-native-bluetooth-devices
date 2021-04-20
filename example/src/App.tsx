@@ -4,15 +4,16 @@ import { StyleSheet, View, Text } from 'react-native';
 import BluetoothDevices from 'react-native-bluetooth-devices';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
 
   React.useEffect(() => {
-    BluetoothDevices.multiply(3, 7).then(setResult);
+    BluetoothDevices.addEventListener("onConnectedDevices", (res) => {
+      console.log(res)
+    })
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Hello, Bluetooth!</Text>
     </View>
   );
 }
