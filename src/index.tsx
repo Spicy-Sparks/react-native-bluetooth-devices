@@ -1,9 +1,15 @@
 import { NativeModules, NativeEventEmitter, EmitterSubscription } from 'react-native'
 
+export type DeviceType = {
+  id?: string,
+  uuid: string,
+  name: string,
+}
+
 type BluetoothDevicesType = {
   startScan(): void
-  connectToDevice(deviceId: string): void
-  disconnectFromDevice(deviceId: string): void
+  connectToDevice(uuid: string): void
+  disconnectFromDevice(uuid: string): void
   addEventListener(event: string, listener: (event: any) => any): EmitterSubscription
   removeEventListener(listener: EmitterSubscription): void
   removeAllListeners(event: string): void

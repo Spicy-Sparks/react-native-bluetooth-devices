@@ -23,7 +23,7 @@ RCT_EXPORT_METHOD(startScan) {
     });
 }
 
-RCT_EXPORT_METHOD(disconnect) {
+RCT_EXPORT_METHOD(disconnectFromDevice:(NSString *) deviceId) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -39,8 +39,9 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *) deviceId) {
     NSMutableArray *devices = [NSMutableArray array];
     for (AVAudioSessionPortDescription * output in currentRoute.outputs) {
         NSDictionary *device = @{
-          @"deviceName": output.portName,
+          @"name": output.portName,
           @"portType" : output.portType,
+          @"uuid": output.UID
         };
         [devices addObject: device];
     }
