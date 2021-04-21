@@ -4,7 +4,8 @@ export type DeviceType = {
   id: string,
   name: string,
   portType: string,
-  deviceType: number
+  deviceType: number,
+  isConnected: boolean
 }
 
 type BluetoothDevicesType = {

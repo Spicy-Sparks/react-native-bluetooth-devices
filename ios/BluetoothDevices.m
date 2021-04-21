@@ -23,7 +23,7 @@ RCT_EXPORT_METHOD(startScan) {
     });
 }
 
-RCT_EXPORT_METHOD(disconnectFromDevice:(NSString *) deviceId) {
+RCT_EXPORT_METHOD(disconnect) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -43,6 +43,7 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *) deviceId) {
           @"portType" : output.portType,
           @"id": output.UID,
           @"deviceType": @(0)
+          @"isConnected": @(true)
         };
         [devices addObject: device];
     }

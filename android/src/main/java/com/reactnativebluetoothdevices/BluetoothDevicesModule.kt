@@ -5,10 +5,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioManager
+import android.media.AudioManager.*
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat.getSystemService
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import java.lang.reflect.Method
 import java.util.*
 
 class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
@@ -43,9 +47,19 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
     adapter.startDiscovery()
   }
 
+  fun isConnected(device: BluetoothDevice): Boolean {
+    return try {
+      val m: Method = device.javaClass.getMethod("isConnected")
+      m.invoke(device) as Boolean
+    } catch (e: java.lang.Exception) {
+      return false
+      //throw IllegalStateException(e)
+    }
+  }
+
   @ExperimentalStdlibApi
   @ReactMethod
-  fun connectToDevice (address: String) {
+  fun connectToDevice(address: String) {
 
     val adapter = BluetoothAdapter.getDefaultAdapter()
     val device: BluetoothDevice? = adapter?.bondedDevices?.reduce { final, deviceTmp ->
@@ -54,12 +68,14 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       else final
     }
 
-    if(device == null || device.getBondState() != BluetoothDevice.BOND_BONDED) {
+    if(device == null || device.bondState != BluetoothDevice.BOND_BONDED) {
       return
     }
 
+
+
     try {
-      btSocket = device.createInsecureRfcommSocketToServiceRecord(device.uuids[0].uuid)
+      btSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
       btSocket?.connect()
       connectedAddress = address
     } catch (e: Exception) {
@@ -70,14 +86,34 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun disconnectFromDevice (address: String) {
-    connectedAddress = null
-    if(btSocket != null) {
-      try {
-        btSocket?.close()
-        btSocket = null
-      }
-      catch (e: Exception) {}
+  fun disconnect(address: String) {
+    /*val adapter = BluetoothAdapter.getDefaultAdapter()
+    val device: BluetoothDevice? = adapter?.bondedDevices?.reduce { final, deviceTmp ->
+      if (deviceTmp != null && deviceTmp.address == address)
+        deviceTmp
+      else final
+    }
+
+    if(device == null || device.bondState != BluetoothDevice.BOND_BONDED) {
+      return
+    }
+
+    try {
+      btSocket = device.(device.uuids[0].uuid)
+      btSocket?.close()
+      connectedAddress = address
+    } catch (e: Exception) {
+      connectedAddress = null
+      btSocket = null
+      return
+    }*/
+
+    val am = reactApplicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    if(am != null) {
+      //for speakerphone on
+      am.mode = MODE_NORMAL
+      am.isSpeakerphoneOn = true
     }
   }
 
@@ -94,6 +130,7 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       deviceMap.putString("name", device.name)
       deviceMap.putString("id", device.address)
       deviceMap.putInt("deviceType", device.bluetoothClass.deviceClass)
+      deviceMap.putBoolean("isConnected", isConnected(device))
       devicesResult.pushMap(deviceMap)
     }
     payload.putArray("devices", devicesResult)

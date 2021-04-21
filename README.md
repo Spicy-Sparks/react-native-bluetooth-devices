@@ -25,7 +25,7 @@ BluetoothDevices.addEventListener("onConnectedDevices", (res: {
 
   BluetoothDevices.connectToDevice(res.devices[0].id)
 
-  BluetoothDevices.disconnectFromDevice(res.devices[0].id)
+  BluetoothDevices.disconnect()
 })
 ```
 
