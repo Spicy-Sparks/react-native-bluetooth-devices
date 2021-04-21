@@ -1,9 +1,9 @@
 import { NativeModules, NativeEventEmitter, EmitterSubscription } from 'react-native'
 
 export type DeviceType = {
-  id?: string,
   uuid: string,
   name: string,
+  portType: string,
 }
 
 type BluetoothDevicesType = {
