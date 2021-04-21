@@ -13,8 +13,8 @@ export default function App() {
 
       console.log(res.devices)
 
-      BluetoothDevices.connectToDevice(res.devices[0].uuid)
-      BluetoothDevices.disconnectFromDevice(res.devices[0].uuid)
+      BluetoothDevices.connectToDevice(res.devices[0].id)
+      BluetoothDevices.disconnectFromDevice(res.devices[0].id)
     })
   }, [])
 
