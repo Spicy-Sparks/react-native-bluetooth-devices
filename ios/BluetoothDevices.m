@@ -41,7 +41,8 @@ RCT_EXPORT_METHOD(connectToDevice:(NSString *) deviceId) {
         NSDictionary *device = @{
           @"name": output.portName,
           @"portType" : output.portType,
-          @"id": output.UID
+          @"id": output.UID,
+          @"deviceType": @(0)
         };
         [devices addObject: device];
     }

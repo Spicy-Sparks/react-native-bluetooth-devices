@@ -1,9 +1,6 @@
 package com.reactnativebluetoothdevices
 
-import android.bluetooth.BluetoothA2dp
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothSocket
+import android.bluetooth.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -96,6 +93,7 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       // (type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
       deviceMap.putString("name", device.name)
       deviceMap.putString("id", device.address)
+      deviceMap.putInt("deviceType", device.bluetoothClass.deviceClass)
       devicesResult.pushMap(deviceMap)
     }
     payload.putArray("devices", devicesResult)
