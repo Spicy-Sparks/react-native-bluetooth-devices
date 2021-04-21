@@ -1,6 +1,6 @@
 {
   "name": "react-native-bluetooth-devices",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Get and connect to bluetooth devices using React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
