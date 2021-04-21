@@ -1,7 +1,7 @@
 import { NativeModules, NativeEventEmitter, EmitterSubscription } from 'react-native'
 
 export type DeviceType = {
-  uuid: string,
+  id: string,
   name: string,
   portType: string,
 }

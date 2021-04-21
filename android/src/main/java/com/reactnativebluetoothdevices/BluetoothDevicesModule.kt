@@ -17,7 +17,7 @@ import java.util.*
 class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
 
   var receiver: BroadcastReceiver? = null
-  var connectedUuid: String? = null
+  var connectedAddress: String? = null
   var btSocket: BluetoothSocket? = null
 
   override fun getName(): String {
@@ -48,13 +48,11 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
 
   @ExperimentalStdlibApi
   @ReactMethod
-  fun connectToDevice (uuid: String) {
-
-    val UUID = UUID.nameUUIDFromBytes(uuid.encodeToByteArray());
+  fun connectToDevice (address: String) {
 
     val adapter = BluetoothAdapter.getDefaultAdapter()
     val device: BluetoothDevice? = adapter?.bondedDevices?.reduce { final, deviceTmp ->
-      if (deviceTmp != null && deviceTmp.uuids[0].uuid.equals(UUID))
+      if (deviceTmp != null && deviceTmp.address == address)
         deviceTmp
       else final
     }
@@ -64,18 +62,19 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
     }
 
     try {
-      btSocket = device.createInsecureRfcommSocketToServiceRecord(UUID)
+      btSocket = device.createInsecureRfcommSocketToServiceRecord(device.uuids[0].uuid)
       btSocket?.connect()
+      connectedAddress = address
     } catch (e: Exception) {
-      connectedUuid = null
+      connectedAddress = null
       btSocket = null
       return
     }
   }
 
   @ReactMethod
-  fun disconnectFromDevice (uuid: String) {
-    connectedUuid = null
+  fun disconnectFromDevice (address: String) {
+    connectedAddress = null
     if(btSocket != null) {
       try {
         btSocket?.close()
@@ -96,7 +95,7 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       deviceMap.putString("portType", device.type.toString())
       // (type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO)
       deviceMap.putString("name", device.name)
-      deviceMap.putString("uuid", device.uuids[0].uuid.toString())
+      deviceMap.putString("id", device.address)
       devicesResult.pushMap(deviceMap)
     }
     payload.putArray("devices", devicesResult)

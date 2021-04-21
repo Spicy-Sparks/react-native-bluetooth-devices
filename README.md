@@ -14,6 +14,7 @@ npm install react-native-bluetooth-devices
 import BluetoothDevices from "react-native-bluetooth-devices";
 
 // ...
+
 BluetoothDevices.startScan()
 
 BluetoothDevices.addEventListener("onConnectedDevices", (res: {
@@ -22,9 +23,9 @@ BluetoothDevices.addEventListener("onConnectedDevices", (res: {
 
   console.log(res.devices)
 
-  BluetoothDevices.connectToDevice(res.devices[0].uuid)
-  
-  BluetoothDevices.disconnectFromDevice(res.devices[0].uuid)
+  BluetoothDevices.connectToDevice(res.devices[0].id)
+
+  BluetoothDevices.disconnectFromDevice(res.devices[0].id)
 })
 ```
 
