@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import java.lang.reflect.Method
 import java.util.*
 
 class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
@@ -43,9 +44,18 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
     adapter.startDiscovery()
   }
 
+  fun isConnected(device: BluetoothDevice): Boolean {
+    return try {
+      val m: Method = device.javaClass.getMethod("isConnected")
+      m.invoke(device) as Boolean
+    } catch (e: java.lang.Exception) {
+      throw IllegalStateException(e)
+    }
+  }
+
   @ExperimentalStdlibApi
   @ReactMethod
-  fun connectToDevice (address: String) {
+  fun connectToDevice(address: String) {
 
     val adapter = BluetoothAdapter.getDefaultAdapter()
     val device: BluetoothDevice? = adapter?.bondedDevices?.reduce { final, deviceTmp ->
@@ -54,12 +64,14 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       else final
     }
 
-    if(device == null || device.getBondState() != BluetoothDevice.BOND_BONDED) {
+    if(device == null || device.bondState != BluetoothDevice.BOND_BONDED) {
       return
     }
 
+
+
     try {
-      btSocket = device.createInsecureRfcommSocketToServiceRecord(device.uuids[0].uuid)
+      btSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
       btSocket?.connect()
       connectedAddress = address
     } catch (e: Exception) {
@@ -70,7 +82,7 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun disconnectFromDevice (address: String) {
+  fun disconnectFromDevice(address: String) {
     connectedAddress = null
     if(btSocket != null) {
       try {
@@ -94,6 +106,7 @@ class BluetoothDevicesModule(reactContext: ReactApplicationContext) : ReactConte
       deviceMap.putString("name", device.name)
       deviceMap.putString("id", device.address)
       deviceMap.putInt("deviceType", device.bluetoothClass.deviceClass)
+      deviceMap.putBoolean("isConnected", isConnected(device))
       devicesResult.pushMap(deviceMap)
     }
     payload.putArray("devices", devicesResult)
